@@ -18,9 +18,9 @@ const TeacherLogin = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulated login - will be replaced with actual authentication
+    // Test credentials - will be replaced with actual authentication
     setTimeout(() => {
-      if (userId && password) {
+      if (userId === "teacher123" && password === "teacher123") {
         toast({
           title: "Login Successful",
           description: "Welcome back, Teacher!",
@@ -29,7 +29,7 @@ const TeacherLogin = () => {
       } else {
         toast({
           title: "Login Failed",
-          description: "Please enter valid credentials",
+          description: "Invalid credentials. Use teacher123/teacher123",
           variant: "destructive",
         });
       }
@@ -101,7 +101,14 @@ const TeacherLogin = () => {
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </form>
-            <div className="mt-4 text-center">
+            <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border">
+              <p className="text-xs text-muted-foreground text-center mb-1 font-semibold">Test Credentials</p>
+              <p className="text-xs text-center">
+                <span className="font-mono bg-background px-2 py-1 rounded">teacher123</span> / 
+                <span className="font-mono bg-background px-2 py-1 rounded ml-1">teacher123</span>
+              </p>
+            </div>
+            <div className="mt-2 text-center">
               <button className="text-sm text-primary hover:underline">
                 Forgot password?
               </button>
