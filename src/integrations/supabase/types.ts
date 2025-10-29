@@ -14,7 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance_records: {
+        Row: {
+          attendance_date: string
+          class_name: string
+          created_at: string
+          id: string
+          scan_id: string | null
+          status: string
+          student_id: string
+          student_name: string
+        }
+        Insert: {
+          attendance_date?: string
+          class_name: string
+          created_at?: string
+          id?: string
+          scan_id?: string | null
+          status: string
+          student_id: string
+          student_name: string
+        }
+        Update: {
+          attendance_date?: string
+          class_name?: string
+          created_at?: string
+          id?: string
+          scan_id?: string | null
+          status?: string
+          student_id?: string
+          student_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ocr_scans: {
+        Row: {
+          class_name: string
+          created_at: string
+          extracted_text: string | null
+          id: string
+          image_url: string | null
+          processed_at: string | null
+          scan_date: string
+          teacher_id: string
+        }
+        Insert: {
+          class_name: string
+          created_at?: string
+          extracted_text?: string | null
+          id?: string
+          image_url?: string | null
+          processed_at?: string | null
+          scan_date?: string
+          teacher_id: string
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          extracted_text?: string | null
+          id?: string
+          image_url?: string | null
+          processed_at?: string | null
+          scan_date?: string
+          teacher_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

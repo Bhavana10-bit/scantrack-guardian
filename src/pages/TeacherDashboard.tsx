@@ -2,8 +2,18 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Users, Calendar, BarChart3, LogOut, ClipboardCheck } from "lucide-react";
+import { OCRUpload } from "@/components/OCRUpload";
+import { AttendanceHistory } from "@/components/AttendanceHistory";
+import { useState } from "react";
 
 const TeacherDashboard = () => {
+  const [refreshKey, setRefreshKey] = useState(0);
+  const teacherId = "teacher123"; // In a real app, this would come from auth
+
+  const handleScanComplete = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-hero">
       {/* Header */}
@@ -88,6 +98,33 @@ const TeacherDashboard = () => {
           </Card>
         </div>
 
+        {/* OCR Upload Section */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <OCRUpload teacherId={teacherId} onScanComplete={handleScanComplete} />
+          
+          <Card className="shadow-elegant hover:shadow-glow transition-smooth border-border/50">
+            <CardHeader>
+              <div className="h-12 w-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-2">
+                <BarChart3 className="h-6 w-6 text-secondary" />
+              </div>
+              <CardTitle>View Reports</CardTitle>
+              <CardDescription>
+                Generate and view attendance reports and analytics
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="secondary" className="w-full">
+                View Reports
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Attendance History */}
+        <div className="mb-8">
+          <AttendanceHistory key={refreshKey} />
+        </div>
+
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <Card className="shadow-elegant hover:shadow-glow transition-smooth border-border/50">
@@ -109,17 +146,17 @@ const TeacherDashboard = () => {
 
           <Card className="shadow-elegant hover:shadow-glow transition-smooth border-border/50">
             <CardHeader>
-              <div className="h-12 w-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-2">
-                <BarChart3 className="h-6 w-6 text-secondary" />
+              <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center mb-2">
+                <Calendar className="h-6 w-6 text-accent" />
               </div>
-              <CardTitle>View Reports</CardTitle>
+              <CardTitle>Today's Schedule</CardTitle>
               <CardDescription>
-                Generate and view attendance reports and analytics
+                View your class schedule for today
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="secondary" className="w-full">
-                View Reports
+              <Button variant="outline" className="w-full">
+                View Schedule
               </Button>
             </CardContent>
           </Card>
