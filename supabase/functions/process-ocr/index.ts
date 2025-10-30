@@ -41,7 +41,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an OCR assistant. Extract handwritten text from attendance sheets. Return student names and their attendance status (present/absent/late). Format: one student per line as "StudentName: Status".'
+            content: 'You are an OCR assistant. Extract handwritten text from attendance sheets. Return roll number, student name, and their attendance status (present/absent/late). Format: one student per line as "RollNo | StudentName | Status". Example: "101 | John Doe | present".'
           },
           {
             role: 'user',
@@ -115,21 +115,36 @@ serve(async (req) => {
     const attendanceRecords = [];
 
     for (const line of lines) {
-      const match = line.match(/^(.+?):\s*(present|absent|late)/i);
+      // Try to match format: RollNo | StudentName | Status
+      const match = line.match(/^(.+?)\s*\|\s*(.+?)\s*\|\s*(present|absent|late)/i);
       if (match) {
-        const studentName = match[1].trim();
-        const status = match[2].toLowerCase();
-        
-        // Generate a simple student ID based on name
-        const studentId = studentName.toLowerCase().replace(/\s+/g, '_');
+        const rollNo = match[1].trim();
+        const studentName = match[2].trim();
+        const status = match[3].toLowerCase();
         
         attendanceRecords.push({
           scan_id: scanData.id,
-          student_id: studentId,
+          student_id: rollNo,
           student_name: studentName,
           class_name: className,
           status: status,
         });
+      } else {
+        // Fallback to old format if new format not found
+        const oldMatch = line.match(/^(.+?):\s*(present|absent|late)/i);
+        if (oldMatch) {
+          const studentName = oldMatch[1].trim();
+          const status = oldMatch[2].toLowerCase();
+          const studentId = studentName.toLowerCase().replace(/\s+/g, '_');
+          
+          attendanceRecords.push({
+            scan_id: scanData.id,
+            student_id: studentId,
+            student_name: studentName,
+            class_name: className,
+            status: status,
+          });
+        }
       }
     }
 

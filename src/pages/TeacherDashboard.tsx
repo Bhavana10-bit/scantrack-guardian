@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CheckCircle2, Users, Calendar, BarChart3, LogOut, ClipboardCheck } from "lucide-react";
 import { OCRUpload } from "@/components/OCRUpload";
 import { AttendanceHistory } from "@/components/AttendanceHistory";
+import { ManualAttendance } from "@/components/ManualAttendance";
+import { ReportGenerator } from "@/components/ReportGenerator";
 import { useState } from "react";
 
 const TeacherDashboard = () => {
@@ -101,23 +103,12 @@ const TeacherDashboard = () => {
         {/* OCR Upload Section */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <OCRUpload teacherId={teacherId} onScanComplete={handleScanComplete} />
-          
-          <Card className="shadow-elegant hover:shadow-glow transition-smooth border-border/50">
-            <CardHeader>
-              <div className="h-12 w-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-2">
-                <BarChart3 className="h-6 w-6 text-secondary" />
-              </div>
-              <CardTitle>View Reports</CardTitle>
-              <CardDescription>
-                Generate and view attendance reports and analytics
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="secondary" className="w-full">
-                View Reports
-              </Button>
-            </CardContent>
-          </Card>
+          <ReportGenerator />
+        </div>
+
+        {/* Manual Attendance Section */}
+        <div className="mb-8">
+          <ManualAttendance onComplete={handleScanComplete} />
         </div>
 
         {/* Attendance History */}
