@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, GraduationCap, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const StudentLogin = () => {
   const [userId, setUserId] = useState("");
@@ -14,27 +15,57 @@ const StudentLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Test credentials - will be replaced with actual authentication
-    setTimeout(() => {
-      if (userId === "student123" && password === "student123") {
-        toast({
-          title: "Login Successful",
-          description: "Welcome back, Student!",
-        });
-        navigate("/student/dashboard");
-      } else {
+    try {
+      // Verify student credentials
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .select('student_id, student_name')
+        .eq('student_id', userId)
+        .limit(1);
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
         toast({
           title: "Login Failed",
-          description: "Invalid credentials. Use student123/student123",
+          description: "Student ID not found in records",
           variant: "destructive",
         });
+        setIsLoading(false);
+        return;
       }
+
+      // For simplicity, password is same as student ID
+      if (password !== userId) {
+        toast({
+          title: "Login Failed",
+          description: "Invalid password",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${data[0].student_name}!`,
+      });
+      
+      navigate("/student/dashboard", { state: { studentId: userId } });
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login Failed",
+        description: "Failed to login. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -102,10 +133,9 @@ const StudentLogin = () => {
               </Button>
             </form>
             <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border">
-              <p className="text-xs text-muted-foreground text-center mb-1 font-semibold">Test Credentials</p>
+              <p className="text-xs text-muted-foreground text-center mb-1 font-semibold">Login Instructions</p>
               <p className="text-xs text-center">
-                <span className="font-mono bg-background px-2 py-1 rounded">student123</span> / 
-                <span className="font-mono bg-background px-2 py-1 rounded ml-1">student123</span>
+                Use your Student ID for both username and password. Get your credentials from your teacher.
               </p>
             </div>
             <div className="mt-2 text-center">

@@ -6,6 +6,7 @@ import { OCRUpload } from "@/components/OCRUpload";
 import { AttendanceHistory } from "@/components/AttendanceHistory";
 import { ManualAttendance } from "@/components/ManualAttendance";
 import { ReportGenerator } from "@/components/ReportGenerator";
+import { StudentCredentials } from "@/components/StudentCredentials";
 import { useState } from "react";
 
 const TeacherDashboard = () => {
@@ -114,6 +115,11 @@ const TeacherDashboard = () => {
         {/* Attendance History */}
         <div className="mb-8">
           <AttendanceHistory key={refreshKey} />
+        </div>
+
+        {/* Student Credentials */}
+        <div className="mb-8">
+          <StudentCredentials />
         </div>
 
         {/* Quick Actions */}

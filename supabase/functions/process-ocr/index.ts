@@ -41,7 +41,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an OCR assistant. Extract handwritten text from attendance sheets. Return roll number, student name, and their attendance status (present/absent/late). Format: one student per line as "RollNo | StudentName | Status". Example: "101 | John Doe | present".'
+            content: 'You are an OCR assistant. Extract handwritten text from attendance sheets. First, extract the DATE if visible on the sheet (format: DD/MM/YYYY or any visible date). Then extract roll number, student name, and attendance status (present/absent/late). Format: First line "Date: DD/MM/YYYY", then one student per line as "RollNo | StudentName | Status". Example:\nDate: 29/10/2025\n101 | John Doe | present\n102 | Jane Smith | absent'
           },
           {
             role: 'user',
@@ -113,6 +113,23 @@ serve(async (req) => {
     // Parse the extracted text and store attendance records
     const lines = extractedText.split('\n').filter((line: string) => line.trim());
     const attendanceRecords = [];
+    
+    // Try to extract date from the first line
+    let extractedDate = null;
+    const dateMatch = lines[0]?.match(/Date:\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i);
+    if (dateMatch) {
+      // Parse the date and convert to YYYY-MM-DD format
+      const dateParts = dateMatch[1].split(/[\/\-]/);
+      if (dateParts.length === 3) {
+        const day = dateParts[0].padStart(2, '0');
+        const month = dateParts[1].padStart(2, '0');
+        let year = dateParts[2];
+        if (year.length === 2) {
+          year = '20' + year;
+        }
+        extractedDate = `${year}-${month}-${day}`;
+      }
+    }
 
     for (const line of lines) {
       // Try to match format: RollNo | StudentName | Status
@@ -128,6 +145,7 @@ serve(async (req) => {
           student_name: studentName,
           class_name: className,
           status: status,
+          attendance_date: extractedDate || undefined,
         });
       } else {
         // Fallback to old format if new format not found
@@ -143,6 +161,7 @@ serve(async (req) => {
             student_name: studentName,
             class_name: className,
             status: status,
+            attendance_date: extractedDate || undefined,
           });
         }
       }
