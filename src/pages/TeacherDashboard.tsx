@@ -113,15 +113,11 @@ const TeacherDashboard = () => {
           </Card>
         </div>
 
-        {/* OCR Upload Section */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* Attendance Input Methods */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
           <OCRUpload teacherId={teacherId} onScanComplete={handleScanComplete} />
-          <ReportGenerator />
-        </div>
-
-        {/* Manual Attendance Section */}
-        <div className="mb-8">
           <ManualAttendance onComplete={handleScanComplete} />
+          <ReportGenerator />
         </div>
 
         {/* Attendance History */}

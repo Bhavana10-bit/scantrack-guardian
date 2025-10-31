@@ -56,22 +56,40 @@ export const ReportGenerator = () => {
       const uniqueDates = new Set(data.map(record => record.attendance_date));
       const totalClasses = uniqueDates.size;
 
+      // Get all unique student IDs to ensure every student has a record
+      const allStudentIds = new Set(data.map(record => record.student_id));
+
       // Calculate statistics per student
       const studentStats = new Map<string, { name: string; present: number; absent: number; late: number; total: number }>();
       
-      data.forEach(record => {
-        const key = record.student_id;
-        if (!studentStats.has(key)) {
-          studentStats.set(key, {
-            name: record.student_name,
+      // Initialize all students with zero counts
+      allStudentIds.forEach(studentId => {
+        const studentRecord = data.find(r => r.student_id === studentId);
+        if (studentRecord) {
+          studentStats.set(studentId, {
+            name: studentRecord.student_name,
             present: 0,
             absent: 0,
             late: 0,
             total: totalClasses,
           });
         }
-        const stats = studentStats.get(key)!;
-        stats[record.status as 'present' | 'absent' | 'late']++;
+      });
+
+      // Count attendance records per student
+      data.forEach(record => {
+        const stats = studentStats.get(record.student_id);
+        if (stats) {
+          stats[record.status as 'present' | 'absent' | 'late']++;
+        }
+      });
+
+      // Mark remaining dates as absent for students who don't have all dates
+      studentStats.forEach((stats, studentId) => {
+        const studentRecordCount = stats.present + stats.absent + stats.late;
+        if (studentRecordCount < totalClasses) {
+          stats.absent += (totalClasses - studentRecordCount);
+        }
       });
 
       // Generate CSV

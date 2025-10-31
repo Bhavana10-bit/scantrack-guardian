@@ -41,7 +41,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an OCR assistant. Extract handwritten text from attendance sheets. First, extract the DATE if visible on the sheet (format: DD/MM/YYYY or any visible date). Then extract roll number, student name, and attendance status (present/absent/late). Format: First line "Date: DD/MM/YYYY", then one student per line as "RollNo | StudentName | Status". Example:\nDate: 29/10/2025\n101 | John Doe | present\n102 | Jane Smith | absent'
+            content: 'You are an OCR assistant for attendance sheets. IMPORTANT: Weekly attendance sheets may have MULTIPLE DATES across the top (columns). For EACH date found, extract all students attendance for that date. Format your response as follows:\n\nDATE: DD/MM/YYYY\n101 | John Doe | present\n102 | Jane Smith | absent\n\nDATE: DD/MM/YYYY\n101 | John Doe | late\n102 | Jane Smith | present\n\nIf a student has no mark for a date, mark them as "absent". Extract ALL dates you see at the top of the sheet.'
           },
           {
             role: 'user',
@@ -114,24 +114,36 @@ serve(async (req) => {
     const lines = extractedText.split('\n').filter((line: string) => line.trim());
     const attendanceRecords = [];
     
-    // Try to extract date from the first line
-    let extractedDate = null;
-    const dateMatch = lines[0]?.match(/Date:\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i);
-    if (dateMatch) {
-      // Parse the date and convert to YYYY-MM-DD format
-      const dateParts = dateMatch[1].split(/[\/\-]/);
+    // Function to parse date string to YYYY-MM-DD format
+    const parseDateString = (dateStr: string): string => {
+      const dateParts = dateStr.split(/[\/\-]/);
       if (dateParts.length === 3) {
-        const day = dateParts[0].padStart(2, '0');
-        const month = dateParts[1].padStart(2, '0');
+        let day = dateParts[0].padStart(2, '0');
+        let month = dateParts[1].padStart(2, '0');
         let year = dateParts[2];
+        
+        // Handle different formats
         if (year.length === 2) {
           year = '20' + year;
         }
-        extractedDate = `${year}-${month}-${day}`;
+        
+        // Check if format is MM/DD/YYYY or DD/MM/YYYY (assume DD/MM/YYYY for now)
+        return `${year}-${month}-${day}`;
       }
-    }
+      return new Date().toISOString().split('T')[0];
+    };
 
+    // Parse line by line, tracking current date
+    let currentDate = new Date().toISOString().split('T')[0];
+    
     for (const line of lines) {
+      // Check if line contains a date
+      const dateMatch = line.match(/DATE:\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i);
+      if (dateMatch) {
+        currentDate = parseDateString(dateMatch[1]);
+        continue;
+      }
+      
       // Try to match format: RollNo | StudentName | Status
       const match = line.match(/^(.+?)\s*\|\s*(.+?)\s*\|\s*(present|absent|late)/i);
       if (match) {
@@ -145,25 +157,8 @@ serve(async (req) => {
           student_name: studentName,
           class_name: className,
           status: status,
-          attendance_date: extractedDate || new Date().toISOString().split('T')[0],
+          attendance_date: currentDate,
         });
-      } else {
-        // Fallback to old format if new format not found
-        const oldMatch = line.match(/^(.+?):\s*(present|absent|late)/i);
-        if (oldMatch) {
-          const studentName = oldMatch[1].trim();
-          const status = oldMatch[2].toLowerCase();
-          const studentId = studentName.toLowerCase().replace(/\s+/g, '_');
-          
-          attendanceRecords.push({
-            scan_id: scanData.id,
-            student_id: studentId,
-            student_name: studentName,
-            class_name: className,
-            status: status,
-            attendance_date: extractedDate || new Date().toISOString().split('T')[0],
-          });
-        }
       }
     }
 
