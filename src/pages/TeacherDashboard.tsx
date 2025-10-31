@@ -8,10 +8,12 @@ import { ManualAttendance } from "@/components/ManualAttendance";
 import { ReportGenerator } from "@/components/ReportGenerator";
 import { StudentCredentials } from "@/components/StudentCredentials";
 import { useState } from "react";
+import { useAttendanceStats } from "@/hooks/useAttendanceStats";
 
 const TeacherDashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const teacherId = "teacher123"; // In a real app, this would come from auth
+  const { stats, loading } = useAttendanceStats();
 
   const handleScanComplete = () => {
     setRefreshKey(prev => prev + 1);
@@ -51,7 +53,9 @@ const TeacherDashboard = () => {
           <Card className="shadow-elegant border-border/50">
             <CardHeader className="pb-2">
               <CardDescription>Total Students</CardDescription>
-              <CardTitle className="text-3xl">156</CardTitle>
+              <CardTitle className="text-3xl">
+                {loading ? "..." : stats.totalStudents}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -64,12 +68,16 @@ const TeacherDashboard = () => {
           <Card className="shadow-elegant border-border/50">
             <CardHeader className="pb-2">
               <CardDescription>Present Today</CardDescription>
-              <CardTitle className="text-3xl text-secondary">142</CardTitle>
+              <CardTitle className="text-3xl text-secondary">
+                {loading ? "..." : stats.presentToday}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4" />
-                91% Attendance
+                {stats.totalStudents > 0 
+                  ? `${Math.round((stats.presentToday / stats.totalStudents) * 100)}%` 
+                  : "0%"} Attendance
               </div>
             </CardContent>
           </Card>
@@ -77,12 +85,14 @@ const TeacherDashboard = () => {
           <Card className="shadow-elegant border-border/50">
             <CardHeader className="pb-2">
               <CardDescription>Absent Today</CardDescription>
-              <CardTitle className="text-3xl text-destructive">14</CardTitle>
+              <CardTitle className="text-3xl text-destructive">
+                {loading ? "..." : stats.absentToday}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />
-                Requires attention
+                {stats.absentToday > 0 ? "Requires attention" : "All present"}
               </div>
             </CardContent>
           </Card>
@@ -90,7 +100,9 @@ const TeacherDashboard = () => {
           <Card className="shadow-elegant border-border/50">
             <CardHeader className="pb-2">
               <CardDescription>Active Classes</CardDescription>
-              <CardTitle className="text-3xl">5</CardTitle>
+              <CardTitle className="text-3xl">
+                {loading ? "..." : stats.activeClasses}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

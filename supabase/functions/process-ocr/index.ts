@@ -145,7 +145,7 @@ serve(async (req) => {
           student_name: studentName,
           class_name: className,
           status: status,
-          attendance_date: extractedDate || undefined,
+          attendance_date: extractedDate || new Date().toISOString().split('T')[0],
         });
       } else {
         // Fallback to old format if new format not found
@@ -161,7 +161,7 @@ serve(async (req) => {
             student_name: studentName,
             class_name: className,
             status: status,
-            attendance_date: extractedDate || undefined,
+            attendance_date: extractedDate || new Date().toISOString().split('T')[0],
           });
         }
       }
