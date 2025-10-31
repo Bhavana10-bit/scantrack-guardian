@@ -52,7 +52,11 @@ export const ReportGenerator = () => {
         return;
       }
 
-      // Calculate statistics
+      // Calculate total unique class sessions
+      const uniqueDates = new Set(data.map(record => record.attendance_date));
+      const totalClasses = uniqueDates.size;
+
+      // Calculate statistics per student
       const studentStats = new Map<string, { name: string; present: number; absent: number; late: number; total: number }>();
       
       data.forEach(record => {
@@ -63,12 +67,11 @@ export const ReportGenerator = () => {
             present: 0,
             absent: 0,
             late: 0,
-            total: 0,
+            total: totalClasses,
           });
         }
         const stats = studentStats.get(key)!;
         stats[record.status as 'present' | 'absent' | 'late']++;
-        stats.total++;
       });
 
       // Generate CSV
