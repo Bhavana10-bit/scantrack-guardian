@@ -115,29 +115,29 @@ const Index = () => {
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           <div className="text-center space-y-3">
             <div className="h-12 w-12 rounded-lg bg-gradient-primary flex items-center justify-center mx-auto">
-              <BarChart3 className="h-6 w-6 text-white" />
+              <CheckCircle2 className="h-6 w-6 text-white" />
             </div>
-            <h4 className="font-semibold">Real-time Analytics</h4>
+            <h4 className="font-semibold">Very Easy to Use</h4>
             <p className="text-sm text-muted-foreground">
-              Get instant insights into attendance patterns and trends
+              Simple and intuitive interface that anyone can use without training
             </p>
           </div>
           <div className="text-center space-y-3">
             <div className="h-12 w-12 rounded-lg bg-gradient-primary flex items-center justify-center mx-auto">
-              <CheckCircle2 className="h-6 w-6 text-white" />
+              <BarChart3 className="h-6 w-6 text-white" />
             </div>
-            <h4 className="font-semibold">Easy to Use</h4>
+            <h4 className="font-semibold">Saves Time for Teachers</h4>
             <p className="text-sm text-muted-foreground">
-              Intuitive interface designed for both teachers and students
+              Quick attendance marking with OCR technology reduces manual work
             </p>
           </div>
           <div className="text-center space-y-3">
             <div className="h-12 w-12 rounded-lg bg-gradient-primary flex items-center justify-center mx-auto">
               <Users className="h-6 w-6 text-white" />
             </div>
-            <h4 className="font-semibold">Secure & Reliable</h4>
+            <h4 className="font-semibold">Stores Data & Generates Reports</h4>
             <p className="text-sm text-muted-foreground">
-              Your data is protected with enterprise-grade security
+              Automatically stores attendance records and creates detailed reports
             </p>
           </div>
         </div>
