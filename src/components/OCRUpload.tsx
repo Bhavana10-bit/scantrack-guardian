@@ -14,6 +14,7 @@ interface OCRUploadProps {
 
 export const OCRUpload = ({ teacherId, onScanComplete }: OCRUploadProps) => {
   const [className, setClassName] = useState("");
+  const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const { toast } = useToast();
@@ -54,10 +55,10 @@ export const OCRUpload = ({ teacherId, onScanComplete }: OCRUploadProps) => {
   };
 
   const handleProcessOCR = async () => {
-    if (!className || !previewImage) {
+    if (!className || !previewImage || !attendanceDate) {
       toast({
         title: "Missing information",
-        description: "Please provide class name and upload an image",
+        description: "Please provide class name, date, and upload an image",
         variant: "destructive",
       });
       return;
@@ -70,6 +71,7 @@ export const OCRUpload = ({ teacherId, onScanComplete }: OCRUploadProps) => {
           imageBase64: previewImage,
           teacherId,
           className,
+          attendanceDate,
         },
       });
 
@@ -82,6 +84,7 @@ export const OCRUpload = ({ teacherId, onScanComplete }: OCRUploadProps) => {
         });
         setPreviewImage(null);
         setClassName("");
+        setAttendanceDate(new Date().toISOString().split('T')[0]);
         onScanComplete?.();
       } else {
         throw new Error(data.error || 'Failed to process OCR');
@@ -110,15 +113,27 @@ export const OCRUpload = ({ teacherId, onScanComplete }: OCRUploadProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="className">Class Name</Label>
-          <Input
-            id="className"
-            placeholder="e.g., Mathematics 101"
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-            disabled={isProcessing}
-          />
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="className">Class Name</Label>
+            <Input
+              id="className"
+              placeholder="e.g., Mathematics 101"
+              value={className}
+              onChange={(e) => setClassName(e.target.value)}
+              disabled={isProcessing}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="attendanceDate">Date</Label>
+            <Input
+              id="attendanceDate"
+              type="date"
+              value={attendanceDate}
+              onChange={(e) => setAttendanceDate(e.target.value)}
+              disabled={isProcessing}
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -157,7 +172,7 @@ export const OCRUpload = ({ teacherId, onScanComplete }: OCRUploadProps) => {
 
         <Button
           onClick={handleProcessOCR}
-          disabled={!className || !previewImage || isProcessing}
+          disabled={!className || !previewImage || !attendanceDate || isProcessing}
           className="w-full"
           variant="hero"
         >

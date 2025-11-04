@@ -53,24 +53,62 @@ export const ManualAttendance = ({ onComplete }: ManualAttendanceProps) => {
 
     setIsSaving(true);
     try {
-      const records = entries.map(entry => ({
-        student_id: entry.rollNo,
-        student_name: entry.studentName,
-        class_name: className,
-        status: entry.status,
-        attendance_date: attendanceDate,
-        scan_id: null,
-      }));
+      let updatedCount = 0;
+      let insertedCount = 0;
 
-      const { error } = await supabase
-        .from('attendance_records')
-        .insert(records);
+      // Process each entry: update if exists, insert if new
+      for (const entry of entries) {
+        // Check if record exists for this student on this date
+        const { data: existingRecords, error: fetchError } = await supabase
+          .from('attendance_records')
+          .select('id')
+          .eq('student_id', entry.rollNo)
+          .eq('attendance_date', attendanceDate)
+          .eq('class_name', className);
 
-      if (error) throw error;
+        if (fetchError) throw fetchError;
+
+        if (existingRecords && existingRecords.length > 0) {
+          // Update all existing records for this student/date/class
+          const { error: updateError } = await supabase
+            .from('attendance_records')
+            .update({
+              student_name: entry.studentName,
+              status: entry.status,
+            })
+            .eq('student_id', entry.rollNo)
+            .eq('attendance_date', attendanceDate)
+            .eq('class_name', className);
+
+          if (updateError) throw updateError;
+          updatedCount++;
+        } else {
+          // Insert new record
+          const { error: insertError } = await supabase
+            .from('attendance_records')
+            .insert({
+              student_id: entry.rollNo,
+              student_name: entry.studentName,
+              class_name: className,
+              status: entry.status,
+              attendance_date: attendanceDate,
+              scan_id: null,
+            });
+
+          if (insertError) throw insertError;
+          insertedCount++;
+        }
+      }
+
+      const message = updatedCount > 0 && insertedCount > 0
+        ? `Updated ${updatedCount} and added ${insertedCount} records`
+        : updatedCount > 0
+        ? `Updated ${updatedCount} attendance record${updatedCount > 1 ? 's' : ''}`
+        : `Saved ${insertedCount} new attendance record${insertedCount > 1 ? 's' : ''}`;
 
       toast({
         title: "Success!",
-        description: `Saved attendance for ${entries.length} students`,
+        description: message,
       });
 
       setClassName("");

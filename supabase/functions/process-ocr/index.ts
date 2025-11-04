@@ -12,9 +12,9 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64, teacherId, className } = await req.json();
+    const { imageBase64, teacherId, className, attendanceDate } = await req.json();
     
-    console.log('Processing OCR request for teacher:', teacherId, 'class:', className);
+    console.log('Processing OCR request for teacher:', teacherId, 'class:', className, 'date:', attendanceDate);
 
     if (!imageBase64 || !teacherId || !className) {
       return new Response(
@@ -134,7 +134,8 @@ serve(async (req) => {
     };
 
     // Parse line by line, tracking current date
-    let currentDate = new Date().toISOString().split('T')[0];
+    // Use provided attendanceDate as default, or today if not provided
+    let currentDate = attendanceDate || new Date().toISOString().split('T')[0];
     
     for (const line of lines) {
       // Check if line contains a date

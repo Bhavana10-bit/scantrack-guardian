@@ -15,15 +15,13 @@ interface AttendanceRecord {
   scan_id: string;
 }
 
-interface GroupedScan {
-  scanId: string;
+interface GroupedByDate {
   date: string;
-  className: string;
   records: AttendanceRecord[];
 }
 
 export const AttendanceHistory = () => {
-  const [groupedScans, setGroupedScans] = useState<GroupedScan[]>([]);
+  const [groupedByDate, setGroupedByDate] = useState<GroupedByDate[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,25 +38,39 @@ export const AttendanceHistory = () => {
 
       if (error) throw error;
       
-      // Group records by scan_id
-      const grouped = new Map<string, GroupedScan>();
+      // Group records by attendance_date (day) and deduplicate by student_id
+      // Keep only the latest record per student per date (highest id = most recent)
+      const grouped = new Map<string, Map<string, AttendanceRecord>>();
       
       data?.forEach(record => {
-        const scanId = record.scan_id || 'manual';
-        if (!grouped.has(scanId)) {
-          grouped.set(scanId, {
-            scanId,
-            date: record.attendance_date,
-            className: record.class_name,
-            records: []
-          });
+        const dateKey = record.attendance_date;
+        if (!grouped.has(dateKey)) {
+          grouped.set(dateKey, new Map());
         }
-        grouped.get(scanId)!.records.push(record);
+        const studentsMap = grouped.get(dateKey)!;
+        const studentKey = record.student_id;
+        
+        // Keep only the latest record (highest id) for each student on this date
+        if (!studentsMap.has(studentKey)) {
+          studentsMap.set(studentKey, record);
+        } else {
+          const existing = studentsMap.get(studentKey)!;
+          // Compare by id (higher id = more recent)
+          if (parseInt(record.id) > parseInt(existing.id)) {
+            studentsMap.set(studentKey, record);
+          }
+        }
       });
       
-      // Convert to array and take only the 5 most recent scans
-      const scansArray = Array.from(grouped.values()).slice(0, 5);
-      setGroupedScans(scansArray);
+      // Convert to array, sort by date desc and take recent days
+      const datesArray = Array.from(grouped.entries())
+        .map(([date, studentsMap]) => ({
+          date,
+          records: Array.from(studentsMap.values())
+        }))
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 10);
+      setGroupedByDate(datesArray);
     } catch (error) {
       console.error('Error fetching attendance records:', error);
     } finally {
@@ -101,25 +113,31 @@ export const AttendanceHistory = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {groupedScans.length === 0 ? (
+        {groupedByDate.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">
             No attendance records yet. Upload an attendance sheet to get started.
           </p>
         ) : (
           <div className="space-y-6">
-            {groupedScans.map((scan) => (
-              <div key={scan.scanId} className="space-y-3">
-                <div className="flex items-center gap-2 pb-2 border-b border-border">
+            {groupedByDate.map((group) => (
+              <div key={group.date} className="space-y-3">
+                {/* Mini header indicating new day */}
+                <div className="flex items-center gap-2 py-2 px-3 rounded-md bg-muted/40 border border-border">
                   <Calendar className="h-4 w-4 text-secondary" />
-                  <h3 className="font-semibold">
-                    {scan.className} - {format(new Date(scan.date), 'MMM dd, yyyy')}
+                  <h3 className="text-sm font-semibold">
+                    {format(new Date(group.date), 'EEE, MMM dd, yyyy')}
                   </h3>
                   <Badge variant="outline" className="ml-auto">
-                    {scan.records.length} students
+                    {group.records.length} records
                   </Badge>
                 </div>
                 <div className="grid gap-2">
-                  {scan.records.map((record) => (
+                  {group.records
+                    .sort((a, b) => {
+                      // Sort by student_name alphabetically
+                      return a.student_name.localeCompare(b.student_name, undefined, { sensitivity: 'base' });
+                    })
+                    .map((record) => (
                     <div
                       key={record.id}
                       className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-smooth"
@@ -128,7 +146,10 @@ export const AttendanceHistory = () => {
                         <div className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
                           {record.student_id}
                         </div>
-                        <span className="font-medium">{record.student_name}</span>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{record.student_name}</span>
+                          <span className="text-xs text-muted-foreground">{record.class_name}</span>
+                        </div>
                       </div>
                       <Badge className={getStatusColor(record.status)}>
                         {record.status}
