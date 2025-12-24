@@ -1,12 +1,17 @@
+// @ts-ignore: Deno imports are valid in Supabase Edge Functions
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// @ts-ignore: Deno imports are valid in Supabase Edge Functions
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.77.0";
+
+// @ts-ignore: Deno global is available in Supabase Edge Functions
+declare const Deno: any;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -37,7 +42,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gemini-1.5-flash',
         messages: [
           {
             role: 'system',
@@ -53,7 +58,7 @@ serve(async (req) => {
               {
                 type: 'image_url',
                 image_url: {
-                  url: imageBase64
+                  url: `data:image/jpeg;base64,${imageBase64}`
                 }
               }
             ]

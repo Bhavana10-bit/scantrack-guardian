@@ -1,6 +1,39 @@
-# Welcome to your Lovable project
+# ScanTrack Guardian
 
-## Project info
+## Project Overview
+
+ScanTrack Guardian is an innovative attendance management system built using Lovable to streamline the process of tracking student attendance. This project addresses a common issue faced by teachers: the time-consuming task of manually entering attendance records one by one.
+
+## Problem Solved
+
+Traditional attendance systems require teachers to input each student's attendance individually, which can be tedious and prone to errors, especially in large classes. This manual process wastes valuable teaching time and can lead to inaccuracies in attendance records.
+
+## Solution
+
+ScanTrack Guardian revolutionizes attendance tracking by allowing teachers to simply upload a picture of the attendance sheet. Our integrated OCR (Optical Character Recognition) technology automatically scans the image, extracts attendance data, and uploads it directly to the portal. This automated process saves significant time and reduces errors, enabling teachers to focus more on education rather than administrative tasks.
+
+## Key Features
+
+- **OCR-Powered Attendance Upload**: Upload images of attendance sheets for automatic scanning and data extraction
+- **Student Dashboard**: Students can only view their own attendance records
+- **Teacher Dashboard**: Teachers can manage classes, view reports, and generate attendance summaries
+- **Manual Attendance Entry**: Option for manual entry when needed
+- **Report Generator**: Teachers can generate detailed attendance reports for classes and students
+- **Real-time Updates**: Instant synchronization of attendance data
+- **Role-Based Access**: Secure access control ensuring teachers have full management capabilities while students have view-only access to their data
+
+## Technologies Used
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+- Supabase (for backend and database)
+
+## Project Info
 
 **URL**: https://lovable.dev/projects/939f8ba4-b408-4e15-a409-1b1c7b772a84
 
@@ -49,16 +82,6 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
 
 ## How can I deploy this project?
 
