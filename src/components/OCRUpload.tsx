@@ -94,9 +94,19 @@ export const OCRUpload = ({ teacherId, onScanComplete }: OCRUploadProps) => {
       }
     } catch (error) {
       console.error('Error processing OCR:', error);
+      
+      // Check if it's a network/edge function error (common when running locally)
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isLocalDevError = errorMessage.includes('Failed to fetch') || 
+                              errorMessage.includes('NetworkError') ||
+                              errorMessage.includes('FunctionsHttpError') ||
+                              errorMessage.includes('edge function');
+      
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process attendance sheet",
+        title: isLocalDevError ? "Edge Function Not Available" : "Error",
+        description: isLocalDevError 
+          ? "OCR processing requires the deployed version. Please use the live app at lovable.app or deploy the project."
+          : errorMessage || "Failed to process attendance sheet",
         variant: "destructive",
       });
     } finally {
