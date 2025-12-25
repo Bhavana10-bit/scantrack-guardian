@@ -20,11 +20,15 @@ const StudentLogin = () => {
     setIsLoading(true);
 
     try {
+      // Trim whitespace from inputs
+      const trimmedUserId = userId.trim();
+      const trimmedPassword = password.trim();
+
       // Verify student credentials
       const { data, error } = await supabase
         .from('attendance_records')
         .select('student_id, student_name')
-        .eq('student_id', userId)
+        .eq('student_id', trimmedUserId)
         .limit(1);
 
       if (error) throw error;
@@ -40,7 +44,7 @@ const StudentLogin = () => {
       }
 
       // For simplicity, password is same as student ID
-      if (password !== userId) {
+      if (trimmedPassword !== trimmedUserId) {
         toast({
           title: "Login Failed",
           description: "Invalid password",
@@ -55,7 +59,7 @@ const StudentLogin = () => {
         description: `Welcome back, ${data[0].student_name}!`,
       });
       
-      navigate("/student/dashboard", { state: { studentId: userId } });
+      navigate("/student/dashboard", { state: { studentId: trimmedUserId } });
     } catch (error) {
       console.error('Login error:', error);
       toast({
