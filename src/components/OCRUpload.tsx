@@ -66,9 +66,12 @@ export const OCRUpload = ({ teacherId, onScanComplete }: OCRUploadProps) => {
 
     setIsProcessing(true);
     try {
+      // Remove the data URL prefix to get just the base64 string
+      const base64Data = previewImage.replace(/^data:image\/\w+;base64,/, '');
+      
       const { data, error } = await supabase.functions.invoke('process-ocr', {
         body: {
-          imageBase64: previewImage,
+          imageBase64: base64Data,
           teacherId,
           className,
           attendanceDate,
