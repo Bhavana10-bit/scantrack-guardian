@@ -1,8 +1,8 @@
-# ScanTrack Guardian
+# ScanTrack 
 
 ## Project Overview
 
-ScanTrack Guardian is an innovative attendance management system built using Lovable to streamline the process of tracking student attendance. This project addresses a common issue faced by teachers: the time-consuming task of manually entering attendance records one by one.
+ScanTrack is an innovative attendance management system built using Lovable to streamline the process of tracking student attendance. This project addresses a common issue faced by teachers: the time-consuming task of manually entering attendance records one by one.
 
 ## Problem Solved
 
@@ -10,7 +10,7 @@ Traditional attendance systems require teachers to input each student's attendan
 
 ## Solution
 
-ScanTrack Guardian revolutionizes attendance tracking by allowing teachers to simply upload a picture of the attendance sheet. Our integrated OCR (Optical Character Recognition) technology automatically scans the image, extracts attendance data, and uploads it directly to the portal. This automated process saves significant time and reduces errors, enabling teachers to focus more on education rather than administrative tasks.
+ScanTrack revolutionizes attendance tracking by allowing teachers to simply upload a picture of the attendance sheet. Our integrated OCR (Optical Character Recognition) technology automatically scans the image, extracts attendance data, and uploads it directly to the portal. This automated process saves significant time and reduces errors, enabling teachers to focus more on education rather than administrative tasks.
 
 ## Key Features
 
