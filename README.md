@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-ScanTrack is an innovative attendance management system built using Lovable to streamline the process of tracking student attendance. This project addresses a common issue faced by teachers: the time-consuming task of manually entering attendance records one by one.
+ScanTrack is an innovative attendance management system built to streamline the process of tracking student attendance. This project addresses a common issue faced by teachers: the time-consuming task of manually entering attendance records one by one.
 
 ## Problem Solved
 
